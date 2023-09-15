@@ -308,6 +308,7 @@ def create_model_and_transforms(
         aug_cfg: Optional[Union[Dict[str, Any], AugmentationCfg]] = None,
         cache_dir: Optional[str] = None,
         output_dict: Optional[bool] = None,
+        force_input_size = None,
 ):
     model = create_model(
         model_name,
@@ -325,17 +326,21 @@ def create_model_and_transforms(
         output_dict=output_dict,
     )
 
+    if force_input_size!= None:
+        input_size = force_input_size
+    else:
+        input_size = model.visual.image_size
     image_mean = image_mean or getattr(model.visual, 'image_mean', None)
     image_std = image_std or getattr(model.visual, 'image_std', None)
     preprocess_train = image_transform(
-        model.visual.image_size,
+        input_size,
         is_train=True,
         mean=image_mean,
         std=image_std,
         aug_cfg=aug_cfg,
     )
     preprocess_val = image_transform(
-        model.visual.image_size,
+        input_size,
         is_train=False,
         mean=image_mean,
         std=image_std,
